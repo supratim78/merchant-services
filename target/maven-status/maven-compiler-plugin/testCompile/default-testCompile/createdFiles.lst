@@ -1,0 +1,14 @@
+com\cts\ms\TestUtils$DynamodbEventMixin.class
+com\cts\ms\TestContext$1.class
+com\cts\ms\TestUtils$1.class
+com\cts\ms\TestUtils$DynamodbEventMixin$AttributeValueMixIn.class
+com\cts\ms\TestUtils$UpperCaseRecordsPropertyNamingStrategy.class
+com\cts\ms\TestUtils.class
+com\cts\ms\TestContext$TestLogger.class
+com\cts\ms\TestUtils$DynamodbEventMixin$RecordMixin.class
+com\cts\ms\TestUtils$DateTimeSerializer.class
+com\cts\ms\handler\TestSubmitMerchantOnBoardingRequestHandler.class
+com\cts\ms\TestUtils$TestJacksonMapperModule.class
+com\cts\ms\TestUtils$DynamodbEventMixin$StreamRecordMixin.class
+com\cts\ms\TestUtils$DateTimeDeserializer.class
+com\cts\ms\TestContext.class

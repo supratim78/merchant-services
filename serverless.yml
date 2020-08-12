@@ -1,0 +1,152 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: merchant-services
+# app and org for use with dashboard.serverless.com
+app: merchant-services
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+custom:
+  merchantsOnBoardingRequestTableName: 'ms_merchants_onboarding_request_${self:provider.stage}'
+  merchantsTableName: 'ms_merchants_${self:provider.stage}'
+
+provider:
+  name: aws
+  runtime: java8
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["MSMerchantsOnBoardingRequestDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["MSMerchantsDynamoDBTable", "Arn" ] }
+  environment:
+    MERCHANTS_ONBOARDING_REQUEST_TABLE_NAME: ${self:custom.merchantsOnBoardingRequestTableName}
+    MERCHANTS_TABLE_NAME: ${self:custom.merchantsTableName}
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+#            - "/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+package:
+  artifact: 'target/${self:service}-${self:provider.stage}.jar'
+
+functions:
+  submitMerchantOnBoardingRequest:
+    handler: com.cts.ms.handler.SubmitMerchantOnBoardingRequestHandler
+    events:
+      - http:
+          path: /submitMerchantOnBoardingRequest
+          method: post
+  listAllProvisionedMerchant:
+    handler: com.cts.ms.handler.ListAllProvisionedMerchantRequestHandler
+    events:
+      - http:
+          path: /listAllProvisionedMerchant
+          method: get
+  getProvisionedMerchant:
+    handler: com.cts.ms.handler.GetProvisionedMerchantRequestHandler
+    events:
+      - http:
+          path: /getProvisionedMerchant/{mid}
+          method: get
+  deleteProvisionedMerchant:
+    handler: com.cts.ms.handler.DeleteProvisionedMerchantRequestHandler
+    events:
+      - http:
+          path: /deleteProvisionedMerchant/{mid}
+          method: delete
+#      - cloudwatchLog: '/aws/lambda/merchantServices'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+#      - alb:
+#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          priority: 1
+#          conditions:
+#            host: example.com
+#            path: /hello
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    MSMerchantsOnBoardingRequestDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.merchantsOnBoardingRequestTableName}
+        AttributeDefinitions:
+          - AttributeName: requestId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: requestId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    MSMerchantsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.merchantsTableName}
+        AttributeDefinitions:
+          - AttributeName: mid
+            AttributeType: N
+        KeySchema:
+          - AttributeName: mid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
